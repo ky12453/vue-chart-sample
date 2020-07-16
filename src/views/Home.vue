@@ -12,7 +12,7 @@
           </v-card>
         </v-col>
         <v-col cols="12" md="6">
-          <v-card color="#FF6633">
+          <v-card>
             <div class="card">
               <vue-chart :chartData="chartData" :chartOption="chartOption"/>
             </div>
@@ -59,13 +59,83 @@ export default class Home extends Vue {
           data: patientsGraph.map(d => {
             return d.transition;
           }),
+          backgroundColor: '#00a040',
+          borderColor: '#5a8055',
+          borderWidth: 1,
         },
       ],
     };
   }
 
   chartOption: Chart.ChartOptions = {
+    tooltips: {
+      displayColors: false,
+      callbacks: {
+        label: (tooltipItem, data) => {
+          const labelText = parseInt(tooltipItem.value!).toLocaleString() + '人';
+          return labelText;
+        },
+        title: (tooltipItem, data) => {
+          const label = data.labels![tooltipItem[0].index!] as string;
+          const dates = label.split('/');
+          return dates[0] + '月' + dates[1] + '日';
+        }
+      }
+    },
     maintainAspectRatio: false,
+    legend: {
+          display: false
+    },
+    scales: {
+      xAxes: [
+        {
+          id: 'day',
+          gridLines: {
+            display: false,
+          },
+          ticks: {
+            fontSize: 9,
+            fontColor: '#808080',
+            maxTicksLimit: 20,
+            maxRotation: 0,
+            callback: (label: string) => {
+              return label.split('/')[1]
+            },
+          },
+        },
+        {
+          id: 'month',
+          gridLines: {
+            drawOnChartArea: false,
+            drawTicks: true,
+            drawBorder: false,
+            tickMarkLength: 10,
+          },
+          ticks: {
+            fontSize: 11,
+            fontColor: '#808080',
+            padding: 3,
+            fontStyle: 'bold',
+          },
+          type: 'time',
+          time: {
+            unit: 'month',
+            parser: 'M/D',
+            displayFormats: {
+              month: 'M月',
+            },
+          }
+        },
+      ],
+      yAxes: [
+        {
+          gridLines: {
+            display: true,
+            color: '#E5E5E5',
+          }
+        }
+      ],
+    }
   };
 }
 </script>
