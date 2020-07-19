@@ -14,7 +14,11 @@
         <v-col cols="12" md="6">
           <v-card>
             <div class="card">
-              <vue-chart :chartData="chartData" :chartOption="chartOption"/>
+              <scrollable-chart :displayData="chartData">
+                <template v-slot:chart>
+                  <vue-chart :chartData="chartData" :chartOption="chartOption"/>
+                </template>
+              </scrollable-chart>
             </div>
           </v-card>
         </v-col>
@@ -29,8 +33,9 @@ import VueChart from '@/components/VueChart.vue';
 import { Chart } from 'chart.js';
 import Data from '@/data/data.json';
 import formatGraph from '@/utils/formatGraph';
+import ScrollableChart from '@/components/ScrollableChart.vue';
 
-@Component({components: {VueChart}})
+@Component({components: {VueChart, ScrollableChart}})
 export default class Home extends Vue {
   chartData: Chart.ChartData = {};
   // chartData: Chart.ChartData = {
