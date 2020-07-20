@@ -12,7 +12,26 @@
           </v-card>
         </v-col>
         <v-col cols="12" md="6">
-          <v-card>
+          <data-view title="新規患者に関する報告件数の推移">
+            <template v-slot:description>
+              <ul class="ListStyleNone">
+                <li>（注）保健所から発生届が提出された日を基準とする</li>
+                <li>（注）医療機関等が行った検査も含む</li>
+                <li>（注）チャーター機帰国者、クルーズ船乗客等は含まれていない</li>
+              </ul>
+            </template>
+
+            <scrollable-chart :displayData="chartData">
+              <template v-slot:chart>
+                <vue-chart :chartData="chartData" :chartOption="chartOption"/>
+              </template>
+            </scrollable-chart>
+
+            <template v-slot:dataTable>
+              <data-view-table :headers="tableHeaders()" :items="tableData()"/>
+            </template>
+          </data-view>
+          <!-- <v-card>
             <div class="card">
               <scrollable-chart :displayData="chartData">
                 <template v-slot:chart>
@@ -20,7 +39,8 @@
                 </template>
               </scrollable-chart>
             </div>
-          </v-card>
+          </v-card> -->
+
         </v-col>
       </v-row>
     </v-container>
@@ -34,23 +54,38 @@ import { Chart } from 'chart.js';
 import Data from '@/data/data.json';
 import formatGraph from '@/utils/formatGraph';
 import ScrollableChart from '@/components/ScrollableChart.vue';
+import DataView from '@/components/DataView.vue';
+import DataViewTable from '@/components/DataViewTable.vue';
+import { TableHeader, TableItem } from '@/components/DataViewTable.vue';
 
-@Component({components: {VueChart, ScrollableChart}})
+@Component({components: {VueChart, ScrollableChart, DataView, DataViewTable}})
 export default class Home extends Vue {
   chartData: Chart.ChartData = {};
-  // chartData: Chart.ChartData = {
-  //   labels: ['A', 'B', 'C', 'D', 'E'],
-  //   datasets: [
-  //     {
-  //       label: 'data one',
-  //       data: [1, 5, 3, 4, 3],
-  //     },
-  //     {
-  //       label: 'data two',
-  //       data: [10, 50, 30, 40, 30],
-  //     },
-  //   ],
-  // };
+
+  tableHeaders(): TableHeader[] {
+    return [
+      {
+        text: '日付',
+        value: 'text'
+      },
+      {
+        text: '報告件数の推移（日別）',
+        value: 'transition',
+        align: 'end',
+      },
+    ];
+  }
+
+  tableData(): TableItem[] {
+    const patientsGraph = formatGraph(Data.patients_summary.data);
+    return patientsGraph.map(d => {
+      return {
+        text: d.label,
+        transition: d.transition.toLocaleString(),
+      }
+    })
+  }
+
 
   created() {
     const patientsGraph = formatGraph(Data.patients_summary.data);
